@@ -5,31 +5,35 @@ const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 
-const { HoldingsModel } = require("./model/HoldingsModel");
+const { Holdings } = require("./model/HoldingsModel");
+const { Positions } = require("./model/PositionsModel");
+const { Orders } = require("./model/OrdersModel");
 
-const { PositionsModel } = require("./model/PositionsModel");
-const { OrdersModel } = require("./model/OrdersModel");
+const mainRouter = require("./routes/mainRouter");
 
 const PORT = process.env.PORT || 3002;
 const uri = process.env.MONGO_URL;
 
 const app = express();
 
-app.use(cors());
 app.use(bodyParser.json());
+app.use(cors({ origin: "*" }));
+app.use(express.json());
+
+app.use("/", mainRouter);
 
 app.get("/allHoldings", async (req, res) => {
-  let allHoldings = await HoldingsModel.find({});
+  let allHoldings = await Holdings.find({});
   res.json(allHoldings);
 });
 
 app.get("/allPositions", async (req, res) => {
-  let allPositions = await PositionsModel.find({});
+  let allPositions = await Positions.find({});
   res.json(allPositions);
 });
 
 app.post("/newOrder", async (req, res) => {
-  let newOrder = new OrdersModel({
+  let newOrder = new Orders({
     name: req.body.name,
     qty: req.body.qty,
     price: req.body.price,
